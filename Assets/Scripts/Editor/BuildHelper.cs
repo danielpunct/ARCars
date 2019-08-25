@@ -8,7 +8,7 @@ class BuildHelper
      {
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = new[] { "Assets/Scenes/SampleScene.unity" };
-        buildPlayerOptions.locationPathName = "iOSBuild";
+        buildPlayerOptions.locationPathName = "Builds/iOSBuild";
         buildPlayerOptions.target = BuildTarget.iOS;
         buildPlayerOptions.options = BuildOptions.None;
 
