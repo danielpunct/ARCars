@@ -17,28 +17,19 @@ public class PlaceOnPlane : MonoBehaviour
 {
     [SerializeField]
     [Tooltip("Instantiates this prefab on a plane at the touch location.")]
-    GameObject m_PlacedPrefab;
+    GameObject raceHolder;
 
-    public Transform debug_cube;
     public TMP_Text debug_Text;
+    string arState = "";
     
-    /// <summary>
-    /// The prefab to instantiate on touch.
-    /// </summary>
-    public GameObject placedPrefab
-    {
-        get { return m_PlacedPrefab; }
-        set { m_PlacedPrefab = value; }
-    }
-
-    /// <summary>
-    /// The object instantiated as a result of a successful raycast intersection with a plane.
-    /// </summary>
-    public GameObject spawnedObject { get; private set; }
-
     void Awake()
     {
         m_RaycastManager = GetComponent<ARRaycastManager>();
+    }
+
+    void LogDebug(string message)
+    {
+        debug_Text.text = arState + message;
     }
 
     bool TryGetTouchPosition(out Vector2 touchPosition)
@@ -73,16 +64,10 @@ public class PlaceOnPlane : MonoBehaviour
             // will be the closest hit.
             var hitPose = s_Hits[0].pose;
 
-            debug_Text.text = hitPose.ToString();
+            LogDebug( hitPose.ToString());
 
-            if (spawnedObject == null)
-            {
-                spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
-            }
-            else
-            {
-                spawnedObject.transform.position = hitPose.position;
-            }
+            raceHolder.transform.position = hitPose.position;
+            raceHolder.SetActive(true);
 
             //debug_cube.position = hitPose.position;
         }
