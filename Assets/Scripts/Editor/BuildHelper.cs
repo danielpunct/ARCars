@@ -1,4 +1,7 @@
 using UnityEditor;
+using UnityEditor.Build.Reporting;
+using UnityEngine;
+
 class BuildHelper
 {
      static void PerformBuild ()
