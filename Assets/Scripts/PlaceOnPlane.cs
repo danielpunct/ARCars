@@ -12,18 +12,45 @@ using UnityEngine.XR.ARSubsystems;
 /// If a raycast hits a trackable, the <see cref="placedPrefab"/> is instantiated
 /// and moved to the hit position.
 /// </summary>
+[RequireComponent(typeof(ARSessionOrigin))]
 [RequireComponent(typeof(ARRaycastManager))]
 public class PlaceOnPlane : MonoBehaviour
 {
-    [SerializeField]
-    [Tooltip("Instantiates this prefab on a plane at the touch location.")]
-    GameObject raceHolder;
 
     public TMP_Text debug_Text;
+
     string arState = "";
+    bool isSpawned = false;
+
+    static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
+
+    public Transform content;
+
+    ARSessionOrigin m_SessionOrigin;
+    ARRaycastManager m_RaycastManager;
+
+    [Tooltip("The rotation the content should appear to have.")]
+    [SerializeField] Quaternion m_Rotation;
+
+    /// <summary>
+    /// The rotation the content should appear to have.
+    /// </summary>
+    public Quaternion rotation
+    {
+        get { return m_Rotation; }
+        set
+        {
+            m_Rotation = value;
+            if (m_SessionOrigin != null)
+                m_SessionOrigin.MakeContentAppearAt(content, content.transform.position, m_Rotation);
+        }
+    }
+
     
+
     void Awake()
     {
+        m_SessionOrigin = GetComponent<ARSessionOrigin>();
         m_RaycastManager = GetComponent<ARRaycastManager>();
     }
 
@@ -55,7 +82,7 @@ public class PlaceOnPlane : MonoBehaviour
 
     void Update()
     {
-        if (!TryGetTouchPosition(out Vector2 touchPosition))
+        if (isSpawned || !TryGetTouchPosition(out Vector2 touchPosition))
             return;
 
         if (m_RaycastManager.Raycast(touchPosition, s_Hits, TrackableType.PlaneWithinPolygon))
@@ -64,16 +91,15 @@ public class PlaceOnPlane : MonoBehaviour
             // will be the closest hit.
             var hitPose = s_Hits[0].pose;
 
-            LogDebug( hitPose.ToString());
+            LogDebug(hitPose.ToString());
 
-            raceHolder.transform.position = hitPose.position;
-            raceHolder.SetActive(true);
+            //content.position = hitPose.position;
+            content.gameObject.SetActive(true);
+             m_SessionOrigin.MakeContentAppearAt(content, hitPose.position, m_Rotation);
+
+            isSpawned = true;
 
             //debug_cube.position = hitPose.position;
         }
     }
-
-    static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
-
-    ARRaycastManager m_RaycastManager;
 }
